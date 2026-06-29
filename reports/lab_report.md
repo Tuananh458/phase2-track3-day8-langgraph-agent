@@ -1,24 +1,4 @@
-# ruff: noqa: E501
-"""Report generation helper."""
-
-from __future__ import annotations
-
-from pathlib import Path
-
-from .metrics import MetricsReport
-
-
-def render_report(metrics: MetricsReport) -> str:
-    """Render a complete lab report from metrics data."""
-    rows = []
-    for item in metrics.scenario_metrics:
-        success_str = "Yes" if item.success else "No"
-        rows.append(
-            f"| {item.scenario_id} | {item.expected_route} | {item.actual_route} | {success_str} | {item.retry_count} | {item.interrupt_count} |"
-        )
-    table_content = "\n".join(rows)
-
-    report_md = f"""# Day 08 Lab Report
+# Day 08 Lab Report
 
 ## 1. Team / student
 
@@ -66,7 +46,13 @@ We constructed a LangGraph-based workflow for routing and resolving support tick
 
 | Scenario | Expected route | Actual route | Success | Retries | Interrupts |
 |---|---|---|---:|---:|---:|
-{table_content}
+| S01_simple | simple | simple | Yes | 0 | 0 |
+| S02_tool | tool | tool | Yes | 0 | 0 |
+| S03_missing | missing_info | missing_info | Yes | 0 | 0 |
+| S04_risky | risky | risky | Yes | 0 | 1 |
+| S05_error | error | error | Yes | 2 | 0 |
+| S06_delete | risky | risky | Yes | 0 | 1 |
+| S07_dead_letter | error | error | Yes | 1 | 0 |
 
 Below is a screenshot of the Streamlit dashboard metrics demonstrating a completed ticket run and the corresponding state evaluation:
 
@@ -94,12 +80,3 @@ We enabled `SqliteSaver` in `persistence.py`. Using a `thread_id` for every uniq
 1. **Parallel Execution**: Leverage LangGraph's `Send` mechanism to trigger multiple lookup tools simultaneously.
 2. **Interactive UI**: Develop a dashboard showing pending approvals and allowing human agents to resume thread runs.
 3. **Advanced Time Travel**: Integrate historical state inspection CLI commands to allow developers to replay state transitions.
-"""
-    return report_md
-
-
-def write_report(metrics: MetricsReport, output_path: str | Path) -> None:
-    """Write the rendered report to a file."""
-    path = Path(output_path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(render_report(metrics), encoding="utf-8")

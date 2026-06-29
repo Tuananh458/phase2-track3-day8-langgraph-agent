@@ -12,9 +12,10 @@ Usage in nodes:
 from __future__ import annotations
 
 import os
+from typing import Any
 
 
-def get_llm(model: str | None = None, temperature: float = 0.0):
+def get_llm(model: str | None = None, temperature: float = 0.0) -> Any:  # noqa: ANN401
     """Create an LLM client from environment configuration.
 
     Checks for API keys in this order:
@@ -29,8 +30,9 @@ def get_llm(model: str | None = None, temperature: float = 0.0):
             from langchain_google_genai import ChatGoogleGenerativeAI
         except ImportError as exc:
             raise RuntimeError("Install: pip install langchain-google-genai") from exc
+        model_name = model or os.getenv("LLM_MODEL") or "gemini-2.5-flash"
         return ChatGoogleGenerativeAI(
-            model=model or os.getenv("LLM_MODEL", "gemini-2.5-flash"),
+            model=model_name,
             google_api_key=os.getenv("GEMINI_API_KEY"),
             temperature=temperature,
         )
@@ -40,8 +42,9 @@ def get_llm(model: str | None = None, temperature: float = 0.0):
             from langchain_openai import ChatOpenAI
         except ImportError as exc:
             raise RuntimeError("Install: pip install langchain-openai") from exc
+        model_name = model or os.getenv("LLM_MODEL") or "gpt-4o-mini"
         return ChatOpenAI(
-            model=model or os.getenv("LLM_MODEL", "gpt-4o-mini"),
+            model=model_name,
             temperature=temperature,
         )
 
@@ -50,8 +53,9 @@ def get_llm(model: str | None = None, temperature: float = 0.0):
             from langchain_anthropic import ChatAnthropic
         except ImportError as exc:
             raise RuntimeError("Install: pip install langchain-anthropic") from exc
+        model_name = model or os.getenv("LLM_MODEL") or "claude-sonnet-4-20250514"
         return ChatAnthropic(
-            model=model or os.getenv("LLM_MODEL", "claude-sonnet-4-20250514"),
+            model=model_name,  # type: ignore[call-arg]
             temperature=temperature,
         )
 
